@@ -1,0 +1,140 @@
+<form>
+  <label>WIO - Gas Sensors</label>
+  <description></description>
+  <fieldset submitButton="false">
+    <input type="time" searchWhenChanged="true" token="global_time_tok">
+      <label>Time Range</label>
+      <default>
+        <earliest>-1h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown">
+      <label>Time Span</label>
+      <choice value="auto">auto</choice>
+      <choice value="5s">5s</choice>
+      <choice value="10s">10s</choice>
+      <choice value="30s">30s</choice>
+      <choice value="1m">1m</choice>
+      <choice value="5m">5m</choice>
+      <choice value="10m">10m</choice>
+      <choice value="30m">30m</choice>
+      <choice value="1h">1h</choice>
+      <default>auto</default>
+      <change>
+        <eval token="timechart_span">if($value$ == "auto", "", "span=".$value$)</eval>
+        <eval token="mstats_span">"span=".$value$</eval>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>gas.C3H8, gas.C4H10</title>
+        <search>
+          <query>| mstats avg("gas.C3H8") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.C3H8") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.C3H8"
+| rename "_time - gas.C3H8" AS _time
+| append [
+| mstats avg("gas.C4H10") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.C4H10") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.C4H10"
+| rename "_time - gas.C4H10" AS _time
+]
+| selfjoin keepsingle=true _time</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","6001947ce519":"#f2b827","gas.C4H10":"#d6563c","6001947ce519 - gas.C3H8":"#1e93c6","6001947ce519 - gas.C4H10":"#f2b827","gas.CH4":"#31a35f"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","6001947ce519":"solid","gas.C4H10":"solid","6001947ce519 - gas.C3H8":"solid","6001947ce519 - gas.C4H10":"solid","gas.CH4":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>gas.C2H5OH, gas.CH4, gas.CO, gas.H2, gas.NH3, gas.NO2</title>
+        <search>
+          <query>| mstats avg("gas.C2H5OH") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.C2H5OH") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.C2H5OH"
+| rename "_time - gas.C2H5OH" AS _time
+| append [
+| mstats avg("gas.CH4") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.CH4") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.CH4"
+| rename "_time - gas.CH4" AS _time
+]
+| selfjoin keepsingle=true _time
+| append [
+| mstats avg("gas.CO") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.CO") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.CO"
+| rename "_time - gas.CO" AS _time
+]
+| selfjoin keepsingle=true _time
+| append [
+| mstats avg("gas.H2") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.H2") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.H2"
+| rename "_time - gas.H2" AS _time
+]
+| selfjoin keepsingle=true _time
+| append [
+| mstats avg("gas.NH3") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.NH3") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.NH3"
+| rename "_time - gas.NH3" AS _time
+]
+| selfjoin keepsingle=true _time
+| append [
+| mstats avg("gas.NO2") prestats=true WHERE "index"="wio-metrics" $mstats_span$ BY board_id
+| timechart avg("gas.NO2") $timechart_span$ useother=false BY board_id WHERE max in top5
+| fields - _span*
+| rename * AS "* - gas.NO2"
+| rename "_time - gas.NO2" AS _time
+]
+| selfjoin keepsingle=true _time</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","6001947ce519":"#f2b827","gas.C3H8":"#d6563c","6001947ce519 - gas.C2H5OH":"#1e93c6","6001947ce519 - gas.C3H8":"#f2b827","gas.C4H10":"#6a5c9e","gas.CH4":"#31a35f","6001947ce519 - gas.CH4":"#d6563c","gas.CO":"#3863a0","6001947ce519 - gas.CO":"#6a5c9e","gas.H2":"#cc5068","6001947ce519 - gas.H2":"#31a35f","gas.NH3":"#1e93c6","gas.NO2":"#f2b827","6001947ce519 - gas.NH3":"#ed8440","6001947ce519 - gas.NO2":"#3863a0"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","6001947ce519":"solid","gas.C3H8":"solid","6001947ce519 - gas.C2H5OH":"solid","6001947ce519 - gas.C3H8":"solid","gas.C4H10":"solid","gas.CH4":"solid","6001947ce519 - gas.CH4":"solid","gas.CO":"solid","6001947ce519 - gas.CO":"solid","gas.H2":"solid","6001947ce519 - gas.H2":"solid","gas.NH3":"solid","gas.NO2":"solid","6001947ce519 - gas.NH3":"solid","6001947ce519 - gas.NO2":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>
