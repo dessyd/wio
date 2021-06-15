@@ -1,0 +1,224 @@
+<form>
+  <label>Interior Gases</label>
+  <description></description>
+  <fieldset submitButton="false">
+    <input type="time" searchWhenChanged="true" token="global_time_tok">
+      <label>Time Range</label>
+      <default>
+        <earliest>@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown">
+      <label>Time Span</label>
+      <choice value="auto">auto</choice>
+      <choice value="5s">5s</choice>
+      <choice value="10s">10s</choice>
+      <choice value="30s">30s</choice>
+      <choice value="1m">1m</choice>
+      <choice value="5m">5m</choice>
+      <choice value="10m">10m</choice>
+      <choice value="30m">30m</choice>
+      <choice value="1h">1h</choice>
+      <default>auto</default>
+      <change>
+        <eval token="timechart_span">if($value$ == "auto", "", "span=".$value$)</eval>
+        <eval token="mstats_span">"span=".$value$</eval>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Carbon monoxyde</title>
+      <chart>
+        <title>gas.CO</title>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="gas.CO" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","Wio Link 3":"#1e93c6","Wio Node 1":"#f2b827"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","Wio Link 3":"solid","Wio Node 1":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Propane (C3H8) and Butane (C4H10)</title>
+      <chart>
+        <title>gas.C3H8, gas.C4H10</title>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="gas.C3H8" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*
+| rename * AS "* - gas.C3H8"
+| rename "_time - gas.C3H8" AS _time
+| append [
+| mstats avg(_value) prestats=true WHERE metric_name="gas.C4H10" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*
+| rename * AS "* - gas.C4H10"
+| rename "_time - gas.C4H10" AS _time
+]
+| selfjoin keepsingle=true _time</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.axisY2.abbreviation">auto</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","0f22820be0a8b058584b591d6b7d220e":"#f2b827","ead89577d2c5eb769caf463a1cfa7b1d":"#d6563c","gas.C3H8":"#6a5c9e","gas.C4H10":"#31a35f","gas.CH4":"#ed8440","0f22820be0a8b058584b591d6b7d220e - gas.C2H5OH":"#1e93c6","ead89577d2c5eb769caf463a1cfa7b1d - gas.C2H5OH":"#f2b827","Wio Link 3 - gas.C2H5OH":"#1e93c6","Wio Node 1 - gas.C2H5OH":"#f2b827","0f22820be0a8b058584b591d6b7d220e - gas.C3H8":"#3863a0","ead89577d2c5eb769caf463a1cfa7b1d - gas.C3H8":"#a2cc3e","0f22820be0a8b058584b591d6b7d220e - gas.C4H10":"#cc5068","ead89577d2c5eb769caf463a1cfa7b1d - gas.C4H10":"#73427f","0f22820be0a8b058584b591d6b7d220e - gas.CH4":"#d6563c","ead89577d2c5eb769caf463a1cfa7b1d - gas.CH4":"#6a5c9e","Wio Link 3 - gas.C3H8":"#d6563c","Wio Node 1 - gas.C3H8":"#6a5c9e","Wio Link 3 - gas.C4H10":"#31a35f","Wio Node 1 - gas.C4H10":"#ed8440","Wio Link 3 - gas.CH4":"#3863a0","Wio Node 1 - gas.CH4":"#a2cc3e"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","0f22820be0a8b058584b591d6b7d220e":"solid","ead89577d2c5eb769caf463a1cfa7b1d":"solid","gas.C3H8":"solid","gas.C4H10":"solid","gas.CH4":"solid","0f22820be0a8b058584b591d6b7d220e - gas.C2H5OH":"solid","ead89577d2c5eb769caf463a1cfa7b1d - gas.C2H5OH":"solid","0f22820be0a8b058584b591d6b7d220e - gas.C3H8":"solid","ead89577d2c5eb769caf463a1cfa7b1d - gas.C3H8":"solid","0f22820be0a8b058584b591d6b7d220e - gas.C4H10":"solid","ead89577d2c5eb769caf463a1cfa7b1d - gas.C4H10":"solid","0f22820be0a8b058584b591d6b7d220e - gas.CH4":"solid","ead89577d2c5eb769caf463a1cfa7b1d - gas.CH4":"solid","Wio Link 3 - gas.C2H5OH":"solid","Wio Node 1 - gas.C2H5OH":"solid","Wio Link 3 - gas.C3H8":"solid","Wio Node 1 - gas.C3H8":"solid","Wio Link 3 - gas.C4H10":"solid","Wio Node 1 - gas.C4H10":"solid","Wio Link 3 - gas.CH4":"solid","Wio Node 1 - gas.CH4":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Nitrogen dioxyde</title>
+      <chart>
+        <title>gas.NO2</title>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="gas.NO2" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","Wio Link 3":"#1e93c6","Wio Node 1":"#f2b827"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","Wio Link 3":"solid","Wio Node 1":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Hydrogen</title>
+      <chart>
+        <title>gas.H2</title>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="gas.H2" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","Wio Link 3":"#1e93c6","Wio Node 1":"#f2b827"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","Wio Link 3":"solid","Wio Node 1":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Ethanol (C2H5OH) and Methane (CH4)</title>
+      <chart>
+        <title>gas.C2H5OH, gas.CH4</title>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="gas.C2H5OH" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*
+| rename * AS "* - gas.C2H5OH"
+| rename "_time - gas.C2H5OH" AS _time
+| append [
+| mstats avg(_value) prestats=true WHERE metric_name="gas.CH4" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*
+| rename * AS "* - gas.CH4"
+| rename "_time - gas.CH4" AS _time
+]
+| selfjoin keepsingle=true _time</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","Wio Link 3":"#f2b827","Wio Node 1":"#d6563c","gas.CH4":"#6a5c9e","Wio Link 3 - gas.C2H5OH":"#1e93c6","Wio Node 1 - gas.C2H5OH":"#f2b827","Wio Link 3 - gas.CH4":"#d6563c","Wio Node 1 - gas.CH4":"#6a5c9e"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","Wio Link 3":"solid","Wio Node 1":"solid","gas.CH4":"solid","Wio Link 3 - gas.C2H5OH":"solid","Wio Node 1 - gas.C2H5OH":"solid","Wio Link 3 - gas.CH4":"solid","Wio Node 1 - gas.CH4":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Ammonia</title>
+      <chart>
+        <title>gas.NH3</title>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="gas.NH3" AND index="wio-metrics" $mstats_span$ BY board_name
+| timechart avg(_value) $timechart_span$ agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$global_time_tok.earliest$</earliest>
+          <latest>$global_time_tok.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleY.text">ppm</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6","Wio Link v1.0":"#1e93c6","Wio Node v1.0":"#f2b827","Wio Link 3":"#1e93c6","Wio Node 1":"#f2b827"}</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid","Wio Link v1.0":"solid","Wio Node v1.0":"solid","Wio Link 3":"solid","Wio Node 1":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

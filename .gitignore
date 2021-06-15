@@ -1,0 +1,9 @@
+# .gitignore for Splunk
+*.DS_Store
+*local.meta
+*local/
+*.spl
+*.tar
+*.tgz
+*.r.gz
+@eaDir
